@@ -23,11 +23,14 @@
         <!-- <delete id="module_name.xml_record_id" model="hr.employee"/> -->
 
         <!-- 
-        ############ STOCK ############
+        #######################################################
+        ######################## STOCK ########################
+        #######################################################
         -->
 
         <!-- 
-        *********** stock.picking.type 
+        *********** stock.picking.type ******************************************************************
+        Dashboard
         -->
         
         <!-- me permite filtrar los cuadros del tablero por despósito -->
@@ -44,7 +47,7 @@
         </record>
 
         <!-- 
-        *********** stock.picking 
+        *********** stock.picking ******************************************************************
         -->
 
         <!-- <record id= "agro_vpicktree_inherited" model= "ir.ui.view">
@@ -112,18 +115,14 @@
                     type="object" class="oe_highlight" groups="base.group_user"/>
                 </xpath>
 
-                <!-- <field name="partner_id" position="attributes">
-                    <attribute name="domain">[('customer', '=', True)]</attribute> -->
-                    <!-- <attribute name="domain">[('customer', '=', True)]</attribute> -->
-                    <!-- , ('picking_type_id','=','4') -->
-                <!-- </field> -->
                 <field name="origin" position="before">                    
                     <field name="requiere_aprobacion" invisible="1"/>                    
                     <field name="aprobado_por_id" attrs="{'required': [('requiere_aprobacion', '=', True)]}"/>                
                 </field>
-                <field name="location_id" position="attributes">
+                <!-- Si activo esto, me da un mensaje y no me deja cargar el movimiento -->
+                <!-- <field name="location_id" position="attributes">
                     <attribute name="readonly">1</attribute>
-                </field>
+                </field> -->
                 <field name="location_dest_id" position="attributes">
                     <attribute name="readonly">1</attribute>
                 </field>
@@ -164,6 +163,117 @@
                 </filter>
             </field>
         </record>
+
+        <!-- 
+        *********** stock.quant ******************************************************************
+        a esta opción se accede desde un smart button de productos 
+        -->
+        <record id= "view_stock_quant_tree_inherited" model= "ir.ui.view">
+            
+            <field name="inherit_id" ref="stock.view_stock_quant_tree" />
+            <field name="model">stock.quant</field>
+            <field name="arch" type="xml">                                
+
+                <field name="lot_id" position='after'>
+                    <field name="removal_date" widget="date"/>
+                </field>
+
+                <field name="in_date" position='attributes'>
+                    <attribute name="invisible">1</attribute>
+                    <!-- <attribute name="groups">base.sin_implementar</attribute> -->
+                </field>
+
+                <field name="inventory_value" position='attributes'>
+                    <attribute name="invisible">1</attribute>
+                </field>
+
+            </field>
+        </record>
+
+        <!-- 
+        *********** stock.scrap ******************************************************************
+        -->
+        <record id= "stock_scrap_form_view_inherited" model= "ir.ui.view">            
+            <field name="inherit_id" ref="stock.stock_scrap_form_view" />
+            <field name="model">stock.scrap</field>
+            <field name="arch" type="xml">                               
+
+                <field name="state" position='before'>
+                    <button name="action_aprobar" 
+                    string="Aprobar" 
+                    type="object" 
+                    states="esperando" class="btn-primary" 
+                    groups="stock.group_stock_manager"/>
+                </field>
+
+                <field name="state" position='before'>
+                    <button name="action_rechazar" 
+                    string="Rechazar" 
+                    type="object" 
+                    states="esperando" class="btn-primary"
+                    groups="stock.group_stock_manager"/>
+                </field>
+
+                <field name="state" position='attributes'>
+                    <attribute name="statusbar_visible">draft,esperando,rechazado,done</attribute>
+                    <!-- <attribute name="statusbar_visible" states="rechazado">draft,esperando,rechazado</attribute> -->
+                </field>
+
+                <field name="date_expected" position='after'>
+                    <field name="evaluado_por_id" readonly="1"/>
+                </field>
+
+                <sheet position="after">
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers" />
+                        <field name="message_ids" widget="mail_thread" />
+                    </div>
+                </sheet>
+
+            </field>
+        </record>
+
+        <!-- 
+        *********** stock.production.lot ******************************************************************
+        -->
+        <record id= "agro_view_production_lot_tree_inherited" model= "ir.ui.view">
+            <field name="inherit_id" ref="stock.view_production_lot_tree" />
+            <field name="model">stock.production.lot</field>
+            <field name="arch" type="xml">                
+                <field name="product_id" position="after">                    
+                    <field name="product_qty" string="Cantidad"/>
+                    <field name="removal_date" string="Fecha de vencimiento"/>
+                </field>    
+            </field>
+        </record>  
+
+        <record id= "agro_view_move_form_expiry_inherited" model= "ir.ui.view">
+            <field name="name">stock.production.lot.form</field>
+            <field name="inherit_id" ref="product_expiry.view_move_form_expiry" />
+            <field name="model">stock.production.lot</field>
+            <field name="arch" type="xml">                                
+                <!-- JPG: esto no funciona. Me parece que es para Odoo 10 
+                    <field name="life_date" invisible="1"/> 
+                    -->
+                <field name="life_date" position='attributes'>
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="use_date" position='attributes'>
+                    <attribute name="invisible">1</attribute>
+                </field>      
+                <field name="alert_date" position='attributes'>
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="removal_date" position='replace'>
+                    <field name="removal_date" string='Fecha de vencimiento'/>
+                </field>
+                <field name="removal_date" position='before'>
+                    <field name="fecha_produccion"/>
+                </field>
+            </field>
+        </record>
+
+
 
         <!-- 
         *********** stock.picking.type 
@@ -235,49 +345,6 @@
         </record>
 
         <!-- 
-        *********** stock.production.lot 
-        -->
-        <record id= "agro_view_production_lot_tree_inherited" model= "ir.ui.view">
-            <field name="inherit_id" ref="stock.view_production_lot_tree" />
-            <field name="model">stock.production.lot</field>
-            <field name="arch" type="xml">                
-                <field name="product_id" position="after">                    
-                    <field name="product_qty" string="Cantidad"/>
-                    <field name="removal_date" string="Fecha de vencimiento"/>
-                </field>    
-            </field>
-        </record>  
-
-        <record id= "agro_view_move_form_expiry_inherited" model= "ir.ui.view">
-            <field name="name">stock.production.lot.form</field>
-            <field name="inherit_id" ref="product_expiry.view_move_form_expiry" />
-            <field name="model">stock.production.lot</field>
-            <field name="arch" type="xml">                                
-                <!-- JPG: esto no funciona. Me parece que es para Odoo 10 
-                    <field name="life_date" invisible="1"/> 
-                    -->
-                <field name="product_id" position='before'>
-                    <field name="descripcion"/>
-                </field>
-                <field name="life_date" position='attributes'>
-                    <attribute name="invisible">1</attribute>
-                </field>
-                <field name="use_date" position='attributes'>
-                    <attribute name="invisible">1</attribute>
-                </field>      
-                <field name="alert_date" position='attributes'>
-                    <attribute name="invisible">1</attribute>
-                </field>
-                <field name="removal_date" position='replace'>
-                    <field name="removal_date" string='Fecha de vencimiento'/>
-                </field>
-                <field name="removal_date" position='before'>
-                    <field name="fecha_produccion"/>
-                </field>
-            </field>
-        </record>
-
-        <!-- 
             NO IMPLEMENTADOS
             base.group_user: es el grupo "Employee"
         -->
@@ -298,6 +365,10 @@
         <record id= "stock.menu_stock_sched" model= "ir.ui.menu">
             <field name="groups_id"  eval="[(4,ref('sin_implementar')), 
                                             (3,ref('stock.group_stock_manager'))]" />             
+        </record>
+
+        <record id= "stock.menu_reordering_rules_config" model= "ir.ui.menu">
+            <field name="groups_id"  eval="[(4,ref('sin_implementar'))]" />             
         </record>
 
         <!-- 
@@ -321,79 +392,9 @@
         web_icon="stock,static/description/icon.png"/> -->
 
         <!-- 
-        *********** stock.quant 
-        -->
-
-        <record id= "view_stock_quant_tree_inherited" model= "ir.ui.view">
-            
-            <field name="inherit_id" ref="stock.view_stock_quant_tree" />
-            <field name="model">stock.quant</field>
-            <field name="arch" type="xml">                                
-
-                <field name="lot_id" position='after'>
-                    <field name="removal_date" widget="date"/>
-                </field>
-
-                <field name="in_date" position='attributes'>
-                    <attribute name="invisible">1</attribute>
-                    <!-- <attribute name="groups">base.sin_implementar</attribute> -->
-                </field>
-
-                <field name="inventory_value" position='attributes'>
-                    <attribute name="invisible">1</attribute>
-                </field>
-
-            </field>
-        </record>
-
-        <!-- 
-        *********** stock.scrap 
-        -->
-
-        <record id= "stock_scrap_form_view_inherited" model= "ir.ui.view">            
-            <field name="inherit_id" ref="stock.stock_scrap_form_view" />
-            <field name="model">stock.scrap</field>
-            <field name="arch" type="xml">                               
-
-                <field name="state" position='before'>
-                    <button name="action_aprobar" 
-                    string="Aprobar" 
-                    type="object" 
-                    states="esperando" class="btn-primary" 
-                    groups="stock.group_stock_manager"/>
-                </field>
-
-                <field name="state" position='before'>
-                    <button name="action_rechazar" 
-                    string="Rechazar" 
-                    type="object" 
-                    states="esperando" class="btn-primary"
-                    groups="stock.group_stock_manager"/>
-                </field>
-
-                <field name="state" position='attributes'>
-                    <attribute name="statusbar_visible">draft,esperando,rechazado,done</attribute>
-                    <!-- <attribute name="statusbar_visible" states="rechazado">draft,esperando,rechazado</attribute> -->
-                </field>
-
-                <field name="date_expected" position='after'>
-                    <field name="evaluado_por_id" readonly="1"/>
-                </field>
-
-                <sheet position="after">
-                    <div class="oe_chatter">
-                        <field name="message_follower_ids" widget="mail_followers" />
-                        <field name="message_ids" widget="mail_thread" />
-                    </div>
-                </sheet>
-
-            </field>
-        </record>
-
-
-
-        <!-- 
-        ############ VENTAS ############        
+        #######################################################
+        ######################## VENTAS ########################
+        #######################################################
         -->
 
         <record id= "agro_view_order_form_inherited" model= "ir.ui.view">
@@ -476,7 +477,9 @@
         </record>
 
         <!-- 
-        ############ FACTURACION ############        
+        #######################################################
+        ######################## FACTURACION###################
+        #######################################################
         -->
         <!-- 
             NO IMPLEMENTADOS
