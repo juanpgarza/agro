@@ -39,11 +39,17 @@
             <field name="model">stock.picking.type</field>
             <field name="inherit_id" ref="stock.view_pickingtype_filter"/>
             <field name="arch" type="xml">
-                <field name="warehouse_id" position="after">			
-                    <filter name="filter_GR" string="Dep. Roca" domain="[('warehouse','ilike','%roca%')]" />
-                    <filter name="filter_VR" string="Dep. Regina" domain="[('warehouse','ilike','%regina%')]" />
+                <field name="warehouse_id" position="after">
+                    <filter name="filter_mi_deposito" string="Mi depósito" domain="[('warehouse_id_id','=',True)]" />
+                    <separator/>			
+                    <filter name="pickingtype_filter_GR" string="Dep. Roca" domain="[('warehouse','ilike','%roca%')]" />
+                    <filter name="pickingtype_filter_VR" string="Dep. Regina" domain="[('warehouse','ilike','%regina%')]" />
                 </field>
             </field>
+        </record>
+
+        <record id="stock.stock_picking_type_action" model="ir.actions.act_window">
+            <field name="context">{'search_default_filter_mi_deposito': 1}</field>
         </record>
 
         <!-- 
@@ -71,12 +77,13 @@
             <field name="arch" type="xml">
                 <tree create="false">
                     <!-- <field name="name"/> -->
+                    <field name="id"/>
                     <field name="warehouse"/>
-                    <field name="min_date" string="Fecha"/>
+                    <field name="min_date" string="Fecha" widget="date"/>
                     <!-- <field name="picking_type_id" string='Tipo de movimiento'/> -->
                     <!-- <field name="code"/> -->
                     <field name="picking_type" string='Tipo de movimiento'/>                    
-                    <field name="aprobado_por_id"/>
+                    <!-- <field name="aprobado_por_id"/> -->
                     <field name="location_id"/>
                     <field name="location_dest_id"/>
                     <field name="partner_id"/>
@@ -86,15 +93,9 @@
                     <field name="backorder_id" invisible="1"/>
                     <field name="state"/>
                     <field name="priority" invisible="1"/>
-                    <field name="picking_type_id" invisible="1"/>
-                    <field name="localidad_usuario" invisible="0"/>
+                    <!-- <field name="picking_type_id" invisible="1"/> -->
+                    <!-- <field name="warehouse_id" invisible="0"/> -->
                 </tree>
-            </field>
-        </record>
-
-        <record id="stock.action_picking_tree_all" model="ir.actions.act_window">
-            <field name="context">{ 'search_default_filter_GR':  [('localidad_usuario', 'like', '%cualquiera%')],
-                                    'search_default_filter_VR':  False}
             </field>
         </record>
 
@@ -110,14 +111,39 @@
             <field name="model">stock.picking</field>
             <field name="arch" type="xml"> 
 
-                <xpath expr="//button[@name='action_confirm']" position="after">
+                <!-- <xpath expr="//button[@name='action_confirm']" position="after">
                     <button name="action_aprobar" states="draft, esperando_aprobacion" string="Aprobar" 
                     type="object" class="oe_highlight" groups="base.group_user"/>
-                </xpath>
+                </xpath> -->
 
-                <field name="origin" position="before">                    
+                <field name="state" position='before'>
+                    <button name="action_aprobar" 
+                    string="Aprobar" 
+                    type="object" 
+                    states="esperando" class="btn-primary" 
+                    groups="stock.group_stock_manager"/>
+                </field>
+
+                <field name="state" position='before'>
+                    <button name="action_rechazar" 
+                    string="Rechazar" 
+                    type="object" 
+                    states="esperando" class="btn-primary"
+                    groups="stock.group_stock_manager"/>
+                </field>
+
+                <field name="state" position='attributes'>
+                    <attribute name="statusbar_visible">draft,esperando,rechazado,assigned,done</attribute>
+                    <!-- <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,partially_available,assigned,done" /> -->
+                </field>
+
+                <field name="partner_id" position="before">                    
+                    <field name="id"/>              
+                </field>
+
+                <field name="origin" position="after">                    
                     <field name="requiere_aprobacion" invisible="1"/>                    
-                    <field name="aprobado_por_id" attrs="{'required': [('requiere_aprobacion', '=', True)]}"/>                
+                    <field name="evaluado_por_id"/>                
                 </field>
                 <!-- Si activo esto, me da un mensaje y no me deja cargar el movimiento -->
                 <!-- <field name="location_id" position="attributes">
@@ -145,12 +171,15 @@
             <field name="model">stock.picking</field>
             <field name="inherit_id" ref="stock.view_picking_internal_search"/>
             <field name="arch" type="xml">
+                <field name="name" position="before">
+                    <filter name="filter_mi_deposito" string="Mi depósito" domain="[('warehouse_id','=',True)]" />                     
+                </field>
                 <filter name="late" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </filter>
                 <filter name="backorder" position="before">			
-                    <filter name="filter_GR" string="Dep. Roca" domain="[('warehouse','ilike','%roca%')]" />
-                    <filter name="filter_VR" string="Dep. Regina" domain="[('warehouse','ilike','%regina%')]" />
+                    <filter name="picking_filter_GR" string="Dep. Roca" domain="[('warehouse','ilike','%roca%')]" />
+                    <filter name="picking_filter_VR" string="Dep. Regina" domain="[('warehouse','ilike','%regina%')]" />                    
                 </filter>
                 <filter name="backorder" position="attributes">
                     <attribute name="invisible">1</attribute>
@@ -162,6 +191,10 @@
                     <filter name="filter_tipo_entrega" string="Entregas" domain="[('code','ilike','%Out%')]" />
                 </filter>
             </field>
+        </record>
+
+        <record id="stock.action_picking_tree_all" model="ir.actions.act_window">
+            <field name="context">{'search_default_filter_mi_deposito': 1}</field>
         </record>
 
         <!-- 
@@ -178,13 +211,33 @@
                     <field name="removal_date" widget="date"/>
                 </field>
 
+                <field name="lot_id" position='after'>
+                    <field name="grupo_usuario" invisible="0"/>
+                </field>
+
                 <field name="in_date" position='attributes'>
-                    <attribute name="invisible">1</attribute>
-                    <!-- <attribute name="groups">base.sin_implementar</attribute> -->
+                    <attribute name="attrs">{'invisible': [('grupo_usuario','=','administrador')]}</attribute>
                 </field>
 
                 <field name="inventory_value" position='attributes'>
                     <attribute name="invisible">1</attribute>
+                </field>
+
+            </field>
+        </record>
+
+        <record id= "view_stock_quant_form_inherited" model= "ir.ui.view">
+            
+            <field name="inherit_id" ref="stock.view_stock_quant_form" />
+            <field name="model">stock.quant</field>
+            <field name="arch" type="xml">                                
+
+                <field name="lot_id" position='after'>
+                    <field name="grupo_usuario" invisible="0"/>
+                </field>
+
+                <field name="in_date" position='attributes'>
+                    <attribute name="attrs">{'invisible': [('grupo_usuario','=','administrador')]}</attribute>
                 </field>
 
             </field>
@@ -265,7 +318,7 @@
                     <attribute name="invisible">1</attribute>
                 </field>
                 <field name="removal_date" position='replace'>
-                    <field name="removal_date" string='Fecha de vencimiento'/>
+                    <field name="removal_date" widget="date"/>                    
                 </field>
                 <field name="removal_date" position='before'>
                     <field name="fecha_produccion"/>
@@ -274,6 +327,38 @@
         </record>
 
 
+        <!-- 
+        *********** stock.report 
+        -->
+        <record model="ir.ui.view" id="view_report_stock_tree">
+            <!-- <field name="name">stock.report.product.view</field> -->
+            <field name="model">stock.report.product.view</field>
+            <field eval="10" name="priority"/>
+            <field name="arch" type="xml">
+                <tree string="Inventory Valuation" create="0" delete="0">
+                    <field name="default_code"/>
+                    <field name="product_id"/>
+                    <field name="qty"/>
+                    <!-- <field name="product_uom_id" groups="product.group_uom"/> -->
+                    <field name="location_id"/>
+                    <!-- <field name="owner_id" groups="stock.group_tracking_owner"/>
+                    <field name="lot_id" groups="stock.group_production_lot"/>
+                    <field name="package_id" groups="stock.group_tracking_lot"/>
+                    <field name="packaging_type_id" invisible="1"/>
+                    <field name="in_date"/>
+                    <field name="inventory_value" sum="Total"/>
+                    <field name="reservation_id" invisible='1'/>
+                    <field name="propagated_from_id" invisible='1'/>
+                    <field name='company_id' groups="base.group_multi_company"/> -->
+                </tree>
+            </field>
+        </record>
+
+        <act_window id="agro.action_stock_report"  name="Reporte de stock"
+        res_model="stock.report.product.view" view_mode="tree" target="current"/>
+
+        <menuitem id="menu_agro_report_view" parent="stock.menu_warehouse_report"
+        sequence="10" action="agro.action_stock_report" />
 
         <!-- 
         *********** stock.picking.type 
@@ -352,10 +437,8 @@
             <field name="groups_id"  eval="[(4,ref('sin_implementar')), (3,ref('sales_team.group_sale_manager')), (3,ref('base.group_user'))]" />             
         </record>
 
-        <record id= "stock.menu_quants" model= "ir.ui.menu">
-            <field name="groups_id"  eval="[(4,ref('sin_implementar')), 
-                                            (3,ref('sales_team.group_sale_manager'))]" />             
-        </record>    
+     
+        
 
         <record id= "stock.menu_stock_procurement_action" model= "ir.ui.menu">
             <field name="groups_id"  eval="[(4,ref('sin_implementar')), 
@@ -382,6 +465,10 @@
             <field name="groups_id"  eval="[(3,ref('base.group_no_one'))]" />             
         </record>
 
+        <!-- Este reporte permite consultar las cantidades en stock -->
+        <record id= "stock.menu_quants" model= "ir.ui.menu">
+            <field name="groups_id"  eval="[(3,ref('sin_implementar'))], [(3,ref('sales_team.group_sale_manager'))]" />             
+        </record>
 
         <!-- <record id= "stock.menu_stock_root" model= "ir.ui.menu">
             <field name="name" >Stock</field>             
@@ -396,6 +483,19 @@
         ######################## VENTAS ########################
         #######################################################
         -->
+
+        <record id= "view_order_form_inherit_sale_stock_inherited" model= "ir.ui.view">
+            <field name="name">sale.order.form.sale.stock</field>
+            <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock" />
+            <field name="model">sale.order</field>
+            <field name="arch" type="xml">
+
+                <xpath expr="//group[@name='sale_shipping']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+
+            </field>
+        </record>
 
         <record id= "agro_view_order_form_inherited" model= "ir.ui.view">
             <field name="name">sale.order.form</field>
@@ -416,14 +516,17 @@
                 </xpath>
 
                 <!-- Quito el botón "Crear factura" en presu -->
-                <xpath expr="//button[@name='297'][1]" position="attributes">
+                <!-- PROBLEMA: parece que el name 297 cambia en cada instalación: me dio error al crear
+                    otra db.               
+                 -->
+                <!-- <xpath expr="//button[@name='297'][1]" position="attributes">
                     <attribute name="invisible">True</attribute>
-                </xpath>
+                </xpath> -->
 
                 <!-- Quito el botón "Crear factura" en Orden de Venta -->
-                <xpath expr="//button[@name='297'][2]" position="attributes">
+                <!-- <xpath expr="//button[@name='297'][2]" position="attributes">
                     <attribute name="invisible">True</attribute>
-                </xpath>
+                </xpath> -->
                 
                 <!-- Quito la opción "Presupuesto Enviado" de la status bar -->
                 <field name="state" position='attributes'>
@@ -443,12 +546,70 @@
                     <!-- <attribute name="groups">"sin_implementar"</attribute> -->
                 </xpath>
 
+                <field name="payment_term_id" position='attributes'>
+                    <attribute name="invisible">1</attribute>
+                </field>
+
+                <field name="validity_date" position='attributes'>
+                    <attribute name="invisible">1</attribute>
+                </field>
+
+                <xpath expr="//group[@name='sale_total']" position="attributes">
+                    <attribute name="invisible">True</attribute>
+                </xpath>
+
             </field>
         </record>
+
+        <record id= "agro_view_order_tree_inherited" model= "ir.ui.view">
+            <!-- <field name="name">Aplicaciones</field> -->
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_tree" />
+            <field name="arch" type="xml">                                
+
+                <!-- <field name="removal_date" position='before'>
+                    <field name="fecha_produccion"/>
+                </field> -->
+
+                <field name="amount_total" position='attributes'>
+                    <attribute name="invisible">1</attribute>
+                </field>
+
+                <field name="invoice_status" position='attributes'>
+                    <attribute name="invisible">1</attribute>
+                </field>
+
+                <field name="partner_id" position='after'>
+                    <field name="state"/>
+                </field>
+
+                <field name="user_id" position='attributes'>
+                    <attribute name="invisible">1</attribute>
+                </field>
+
+            </field>
+        </record>
+
+        <record id="sale.action_orders" model="ir.actions.act_window">
+            <!-- <field name="name">Aplicaciones</field> -->
+            <!-- <field name="domain">[('state', 'not in', ('draft', 'sent', 'cancel'))]</field> -->
+            <field name="domain">[]</field>
+        </record>
+
+        <menuitem id="menu_aplicacion" parent="stock.menu_stock_inventory_control"
+        sequence="10" action="sale.action_orders"/>
 
         <!-- 
             NO IMPLEMENTADOS
          -->
+
+        <!-- le oculto el menu completo  -->
+        <record id= "sales_team.menu_base_partner" model= "ir.ui.menu">
+            <field name="groups_id"  eval="[(4,ref('sin_implementar')), 
+                                            (3,ref('sales_team.group_sale_manager')), 
+                                            (3,ref('sales_team.group_sale_salesman'))]" />             
+        </record>
+
         <record id= "sales_team.menu_sales_team_act" model= "ir.ui.menu">
             <field name="groups_id"  eval="[(4,ref('sin_implementar')), (3,ref('sales_team.group_sale_manager'))]" />             
         </record>
@@ -490,6 +651,23 @@
                                             (3,ref('account.group_account_manager')),
                                             (3,ref('account.group_account_invoice'))
                                             ]" />             
+        </record>
+
+        <!-- 
+        #######################################################
+        ######################## CONFIGURACION ###################
+        #######################################################
+        -->
+
+        <record id= "view_users_form_inherited" model= "ir.ui.view">
+            <field name="name">res.users.form</field>
+            <field name="inherit_id" ref="base.view_users_form" />
+            <field name="model">res.users</field>
+            <field name="arch" type="xml">
+                <field name="partner_id" position="after">
+                    <field name="warehouse_id_usuario"/>
+                </field>
+            </field>
         </record>
 
   </data>

@@ -2,7 +2,7 @@
 {
     'name': "agro",
     'description' : "agro",
-    'depends': ['base', 'stock', 'product_expiry', 'mail'],
+    'depends': ['base', 'stock', 'product_expiry', 'mail', 'sale_stock'],
 
     'data': [
         'security/ir.model.access.csv',
