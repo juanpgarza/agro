@@ -232,3 +232,4 @@ class SaleOrder(models.Model):
         ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', default='draft')
 
 # en ubuntu 
+# desde windows
