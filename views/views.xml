@@ -326,6 +326,19 @@
             </field>
         </record>
 
+        <!-- 
+        *********** stock.move ******************************************************************
+        -->
+        <record id= "view_move_tree_inherited" model= "ir.ui.view">
+            <field name="inherit_id" ref="stock.view_move_tree" />
+            <field name="model">stock.move</field>
+            <field name="arch" type="xml">                
+                <field name="name" position="before">                    
+                    <field name="id"/>
+                </field>    
+            </field>
+        </record>  
+
 
         <!-- 
         *********** stock.report 
@@ -462,7 +475,7 @@
         </record>
 
         <record id= "stock.menu_report_stock_line_date" model= "ir.ui.menu">
-            <field name="groups_id"  eval="[(3,ref('base.group_no_one'))]" />             
+            <field name="groups_id"  eval="[(4,ref('sin_implementar')), (3,ref('base.group_no_one'))]" />             
         </record>
 
         <!-- Este reporte permite consultar las cantidades en stock -->
@@ -484,7 +497,7 @@
         #######################################################
         -->
 
-        <record id= "view_order_form_inherit_sale_stock_inherited" model= "ir.ui.view">
+<!--         <record id= "view_order_form_inherit_sale_stock_inherited" model= "ir.ui.view">
             <field name="name">sale.order.form.sale.stock</field>
             <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock" />
             <field name="model">sale.order</field>
@@ -495,7 +508,7 @@
                 </xpath>
 
             </field>
-        </record>
+        </record> -->
 
         <record id= "agro_view_order_form_inherited" model= "ir.ui.view">
             <field name="name">sale.order.form</field>
@@ -537,13 +550,12 @@
                     <attribute name="invisible">True</attribute>
                 </xpath> -->
 
-                <xpath expr="//group[@name='sales_person']" position="attributes">
+<!--                 <xpath expr="//group[@name='sales_person']" position="attributes">
                     <attribute name="invisible">True</attribute>
                 </xpath>
 
                 <xpath expr="//group[@name='sale_pay']" position="attributes">
-                    <attribute name="invisible">True</attribute>
-                    <!-- <attribute name="groups">"sin_implementar"</attribute> -->
+                    <attribute name="invisible">True</attribute>                    
                 </xpath>
 
                 <field name="payment_term_id" position='attributes'>
@@ -556,7 +568,7 @@
 
                 <xpath expr="//group[@name='sale_total']" position="attributes">
                     <attribute name="invisible">True</attribute>
-                </xpath>
+                </xpath> -->
 
             </field>
         </record>
