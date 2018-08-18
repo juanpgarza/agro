@@ -141,8 +141,8 @@
                     <field name="id"/>              
                 </field>
 
-                <field name="min_date" position='attributes'>
-                    <field name="min_date" string="Fecha" widget="date"/>
+                <field name="min_date" position='replace'>
+                    <field name="min_date" widget="date"/>
                 </field>
                     
 
@@ -292,6 +292,10 @@
                     <!-- <attribute name="statusbar_visible" states="rechazado">draft,esperando,rechazado</attribute> -->
                 </field>
 
+                <field name="date_expected" position='replace'>
+                    <field name="date_expected" widget="date"/>                    
+                </field>
+
                 <field name="date_expected" position='after'>
                     <field name="evaluado_por_id" readonly="1"/>
                 </field>
@@ -306,6 +310,16 @@
             </field>
         </record>
 
+        <record id= "stock_scrap_tree_view_inherited" model= "ir.ui.view">            
+            <field name="inherit_id" ref="stock.stock_scrap_tree_view" />
+            <field name="model">stock.scrap</field>
+            <field name="arch" type="xml">
+                <field name="create_date" position='replace'>
+                    <field name="create_date" widget="date"/>                    
+                </field>                  
+            </field>
+        </record>
+
         <!-- 
         *********** stock.production.lot ******************************************************************
         -->
@@ -315,8 +329,11 @@
             <field name="arch" type="xml">                
                 <field name="product_id" position="after">                    
                     <field name="product_qty" string="Cantidad"/>
-                    <field name="removal_date" string="Fecha de vencimiento"/>
-                </field>    
+                    <field name="removal_date" string="Fecha de vencimiento" widget="date"/>
+                </field>
+                <field name="create_date" position='replace'>
+                    <field name="create_date" widget="date"/>                    
+                </field>     
             </field>
         </record>  
 
@@ -355,7 +372,13 @@
             <field name="arch" type="xml">                
                 <field name="name" position="before">                    
                     <field name="id"/>
-                </field>    
+                </field>
+                <field name="date_expected" position='replace'>
+                    <field name="date_expected" widget="date"/>                    
+                </field>
+                <field name="date" position='replace'>
+                    <field name="date" widget="date"/>                    
+                </field>
             </field>
         </record>  
 
@@ -578,6 +601,10 @@
                     <field name="numero_pedido"/>
                 </field>
 
+                <field name="date_order" position='replace'>
+                    <field name="date_order" widget="date"/>                    
+                </field>
+
                 <!-- <xpath expr="//group[@name='sale_shipping']" position="attributes">
                     <attribute name="invisible">True</attribute>
                 </xpath> -->
@@ -635,6 +662,10 @@
                 <!-- <field name="removal_date" position='before'>
                     <field name="fecha_produccion"/>
                 </field> -->
+
+                <field name="date_order" position='replace'>
+                    <field name="date_order" widget="date"/>                    
+                </field>
 
                 <field name="amount_total" position='attributes'>
                     <attribute name="invisible">1</attribute>
