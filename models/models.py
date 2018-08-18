@@ -222,6 +222,9 @@ class StockReportProductView(models.Model):
 
 class SaleOrder(models.Model):
     _inherit = ['sale.order']
+    _sql_constraints = [ ('agro_numero_pedido_unico',
+                    'unique (numero_pedido)',
+                     'El número de pedido debe ser único!')]
 
     state = fields.Selection([
         ('draft', 'Borrador'),
@@ -231,4 +234,4 @@ class SaleOrder(models.Model):
         ('cancel', 'Cancelled'),
         ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', default='draft')
 
-    numero_pedido = fields.Char('Número de pedido', required=False)
+    numero_pedido = fields.Char('Número de pedido', required=True)
