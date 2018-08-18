@@ -230,3 +230,5 @@ class SaleOrder(models.Model):
         ('done', 'Locked'),
         ('cancel', 'Cancelled'),
         ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', default='draft')
+
+    numero_pedido = fields.Char('Número de pedido', required=False)

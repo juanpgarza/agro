@@ -141,6 +141,11 @@
                     <field name="id"/>              
                 </field>
 
+                <field name="min_date" position='attributes'>
+                    <field name="min_date" string="Fecha" widget="date"/>
+                </field>
+                    
+
                 <field name="origin" position="after">                    
                     <field name="requiere_aprobacion" invisible="1"/>                    
                     <field name="evaluado_por_id"/>                
@@ -173,10 +178,25 @@
             <field name="arch" type="xml">
                 <field name="name" position="before">
                     <filter name="filter_mi_deposito" string="Mi depósito" domain="[('warehouse_id','=',True)]" />                     
+                    <separator/>
+                    <filter string="Hoy" 
+                    domain="[('date','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59))), ('date','&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]" 
+                    help="Transferencias de hoy"/>                   
                 </field>
+            
                 <filter name="late" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </filter>
+
+                <filter name="confirmed" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </filter>               
+
+                <filter name="done" position="after">			
+                    <filter name="esperando" string="Esperando aprobación" domain="[('state','=', 'esperando')]" help="Movimientos esperando aprobación"/>
+                    <filter name="rechazado" string="Rechazados" domain="[('state','=', 'rechazado')]" help="Movimientos rechazados"/>                   
+                </filter>
+
                 <filter name="backorder" position="before">			
                     <filter name="picking_filter_GR" string="Dep. Roca" domain="[('warehouse','ilike','%roca%')]" />
                     <filter name="picking_filter_VR" string="Dep. Regina" domain="[('warehouse','ilike','%regina%')]" />                    
@@ -497,18 +517,26 @@
         #######################################################
         -->
 
-<!--         <record id= "view_order_form_inherit_sale_stock_inherited" model= "ir.ui.view">
+        <record id= "view_order_form_inherit_sale_stock_inherited" model= "ir.ui.view">
             <field name="name">sale.order.form.sale.stock</field>
             <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock" />
             <field name="model">sale.order</field>
             <field name="arch" type="xml">
 
-                <xpath expr="//group[@name='sale_shipping']" position="attributes">
+<!--                 <xpath expr="//group[@name='sale_shipping']" position="attributes">
                     <attribute name="invisible">True</attribute>
-                </xpath>
+                </xpath> -->
+
+                <field name="incoterm" position='attributes'>
+                    <attribute name="invisible">1</attribute>
+                </field>
+
+                <field name="picking_policy" position='attributes'>
+                    <attribute name="invisible">1</attribute>
+                </field>
 
             </field>
-        </record> -->
+        </record>
 
         <record id= "agro_view_order_form_inherited" model= "ir.ui.view">
             <field name="name">sale.order.form</field>
@@ -546,11 +574,15 @@
                     <attribute name="statusbar_visible">draft,sale</attribute>
                 </field>
 
+                <field name="partner_id" position='before'>
+                    <field name="numero_pedido"/>
+                </field>
+
                 <!-- <xpath expr="//group[@name='sale_shipping']" position="attributes">
                     <attribute name="invisible">True</attribute>
                 </xpath> -->
 
-<!--                 <xpath expr="//group[@name='sales_person']" position="attributes">
+                <xpath expr="//group[@name='sales_person']" position="attributes">
                     <attribute name="invisible">True</attribute>
                 </xpath>
 
@@ -566,9 +598,30 @@
                     <attribute name="invisible">1</attribute>
                 </field>
 
+                <!-- esto no funciona.                
+                 <field name="price_unit" position='attributes'>
+                    <attribute name="invisible">1</attribute>
+                </field> -->                
+                
+                <xpath expr="//field[@name='order_line']/tree/field[@name='qty_invoiced']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='order_line']/tree/field[@name='tax_id']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='order_line']/tree/field[@name='price_subtotal']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
                 <xpath expr="//group[@name='sale_total']" position="attributes">
                     <attribute name="invisible">True</attribute>
-                </xpath> -->
+                </xpath>
 
             </field>
         </record>
