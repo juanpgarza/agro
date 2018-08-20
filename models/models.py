@@ -167,6 +167,12 @@ class StockProductionLot(models.Model):
     # para registrar la fecha de produccion
     fecha_produccion = fields.Date('Fecha de Producción')
 
+    @api.model
+    def create(self, vals):
+        vals['removal_date'] = vals['removal_date'] + ' 10:00:00'
+        # import pdb; pdb.set_trace()        
+        return super(StockProductionLot, self).create(vals)
+
 class StockPickingType(models.Model):
     _inherit = ['stock.picking.type']
     _rec_name = 'warehouse_id'
