@@ -15,6 +15,7 @@ delete from mail_message;
 delete from mail_followers;
 delete from procurement_order;
 delete from product_product;
+delete from product_template;
 
 ALTER SEQUENCE stock_move_id_seq RESTART WITH 1;
 ALTER SEQUENCE stock_quant_id_seq RESTART WITH 1;
@@ -30,6 +31,8 @@ ALTER SEQUENCE stock_picking_id_seq RESTART WITH 1;
 ALTER SEQUENCE sale_order_line_id_seq RESTART WITH 1;
 ALTER SEQUENCE sale_order_id_seq RESTART WITH 1;
 ALTER SEQUENCE mail_followers_id_seq RESTART WITH 1;
+ALTER SEQUENCE product_product_id_seq RESTART WITH 1;
+ALTER SEQUENCE product_template_id_seq RESTART WITH 1;
 
 ALTER SEQUENCE ir_sequence_001 RESTART WITH 1;
 ALTER SEQUENCE ir_sequence_002 RESTART WITH 1;
