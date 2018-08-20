@@ -201,23 +201,34 @@ class ResUsers(models.Model):
 
     warehouse_id_usuario = fields.Many2one('stock.warehouse',string='Depósito del usuario')
 
+class StockMove(models.Model):
+    _inherit = ['stock.move']
+    _order = 'id desc'
+
 class StockReportProductView(models.Model):
         _name = 'stock.report.product.view'
         _description = 'stock.report.product.view'
         _auto = False
 
-        product_id = fields.Many2one('product.product',string='Variante de Producto')
+        product_id = fields.Many2one('product.product',string='Producto')
         default_code = fields.Char('Referencia Interna',related='product_id.default_code')
         location_id = fields.Many2one('stock.location',string='Ubicación')
+        lot_id = fields.Many2one('stock.production.lot',string='Lote')
         qty = fields.Float('Cantidad')
+        warehouse_id = fields.Many2one('stock.warehouse',string='Depósito')
+        removal_date = fields.Datetime('Fecha venc. lote')
 
         @api.model_cr
         def init(self):
                 tools.drop_view_if_exists(self._cr,'stock_report_product_view')
                 self._cr.execute(""" create view stock_report_product_view as (
-                        select max(a.id) as id,a.product_id,a.location_id,
-                        sum(a.qty) as qty from stock_quant a inner join stock_location b 
-                        on b.id = a.location_id where a.reservation_id is null and b.usage = 'internal' group by 2,3
+                            select sw.id as warehouse_id,sq.product_id,sq.location_id, 
+                            sq.lot_id,  spl.removal_date, sum(sq.qty) as qty, max(sq.id) as id
+                            from stock_warehouse sw
+                            /* sw.lot_stock_id: ubicacion elegida para el stock */
+                            inner join stock_quant sq on sw.lot_stock_id = sq.location_id
+                            inner join stock_production_lot spl on sq.lot_id = spl.id
+                            group by 1,2,3,4,5
                         ) """)
 
 class SaleOrder(models.Model):
