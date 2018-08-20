@@ -13,6 +13,8 @@ delete from sale_order_line;
 delete from sale_order;
 delete from mail_message;
 delete from mail_followers;
+delete from procurement_order;
+delete from product_product;
 
 ALTER SEQUENCE stock_move_id_seq RESTART WITH 1;
 ALTER SEQUENCE stock_quant_id_seq RESTART WITH 1;
