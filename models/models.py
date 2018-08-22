@@ -45,6 +45,13 @@ class StockPicking(models.Model):
     # para registrar quien fue el usuario que aprobó/rechazó
     evaluado_por_id = fields.Many2one('res.users','Evaluado por:', readonly=True) 
 
+    # Funciona OK, no hace falta
+    # @api.model
+    # def create(self, vals):
+    #     vals['min_date'] = vals['min_date'] + ' 10:00:00'
+    #     import pdb; pdb.set_trace()  
+    #     return super(StockPicking, self).create(vals)
+
     @api.multi
     def action_confirm(self):
         # import pdb; pdb.set_trace()
@@ -133,6 +140,10 @@ class StockScrap(models.Model):
         ('done', 'Done')], string='Status', default="draft", track_visibility=True)
     # para registrar quien fue el usuario que aprobó/rechazó
     evaluado_por_id = fields.Many2one('res.users','Evaluado por:')    
+
+    #
+    tracking = fields.Selection(related='product_id.tracking', string='tracking')
+
     # sobreescribo para:
     #   de draft cambie a esperando
     #   solo realice el movimiento de stock cuando se aprueba el movimiento
@@ -167,6 +178,8 @@ class StockProductionLot(models.Model):
     # para registrar la fecha de produccion
     fecha_produccion = fields.Date('Fecha de Producción')
 
+    barcode = fields.Char(related='product_id.barcode', string='Código barras')
+    
     @api.model
     def create(self, vals):
         vals['removal_date'] = vals['removal_date'] + ' 10:00:00'
@@ -239,8 +252,12 @@ class StockReportProductView(models.Model):
 
 class SaleOrder(models.Model):
     _inherit = ['sale.order']
+    # _sql_constraints = [ ('agro_numero_pedido_unico',
+    #                 "unique (numero_pedido, state != 'cancel')",
+    #                  'El número de pedido debe ser único!')]
+
     _sql_constraints = [ ('agro_numero_pedido_unico',
-                    'unique (numero_pedido)',
+                    "unique (numero_pedido, active)",
                      'El número de pedido debe ser único!')]
 
     state = fields.Selection([
@@ -252,3 +269,18 @@ class SaleOrder(models.Model):
         ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', default='draft')
 
     numero_pedido = fields.Char('Número de pedido', required=True)
+
+    active = fields.Boolean('Active', default=True)
+
+    @api.multi
+    def action_cancel(self):
+        self.active = False
+        return super(SaleOrder, self).action_cancel()
+
+    # @api.constrains('numero_pedido')
+    # def _check_numero_pedido(self): 
+    #     for order in self:            
+    #         if order.numero_pedido == self.numero_pedido and order.id != self.id:
+    #             # raise UserError(_('Nothing to check the availability for.'))
+    #             raise UserError('Número pedido duplicado!')
+    #         import pdb; pdb.set_trace()

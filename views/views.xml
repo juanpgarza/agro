@@ -326,12 +326,17 @@
                     <!-- <attribute name="statusbar_visible" states="rechazado">draft,esperando,rechazado</attribute> -->
                 </field>
 
+                <field name="lot_id" position='replace'>
+                    <field name="lot_id" attrs="{'required': [('tracking', '=', 'lot')], 'invisible': [('tracking', '!=', 'lot')]}"/>
+                </field>
+
                 <field name="date_expected" position='replace'>
                     <field name="date_expected" widget="date"/>                    
                 </field>
 
                 <field name="date_expected" position='after'>
                     <field name="evaluado_por_id" readonly="1"/>
+                    <field name="tracking" readonly="1"/>
                 </field>
 
                 <sheet position="after">
@@ -361,9 +366,15 @@
             <field name="inherit_id" ref="stock.view_production_lot_tree" />
             <field name="model">stock.production.lot</field>
             <field name="arch" type="xml">                
+                <field name="ref" position='attributes'>
+                    <attribute name="invisible">1</attribute>
+                </field>
+                <field name="product_id" position="before">
+                    <field name="barcode"/>
+                </field>
                 <field name="product_id" position="after">                    
                     <field name="product_qty" string="Cantidad"/>
-                    <field name="removal_date" string="Fecha de vencimiento" widget="date"/>
+                    <field name="removal_date" widget="date"/>
                 </field>
                 <field name="create_date" position='replace'>
                     <field name="create_date" widget="date"/>                    
@@ -647,7 +658,7 @@
                 </field>
 
                 <field name="partner_id" position='before'>
-                    <field name="numero_pedido"/>
+                    <field name="numero_pedido"/>                   
                 </field>
 
                 <field name="date_order" position='replace'>
@@ -725,11 +736,12 @@
                 </field>
 
                 <field name="name" position='after'>
-                    <field name="numero_pedido"/>
+                    <field name="numero_pedido"/>                     
                 </field>
 
                 <field name="partner_id" position='after'>
                     <field name="state"/>
+                    <field name="active"/>
                 </field>
 
                 <field name="user_id" position='attributes'>
@@ -743,6 +755,7 @@
             <!-- <field name="name">Aplicaciones</field> -->
             <!-- <field name="domain">[('state', 'not in', ('draft', 'sent', 'cancel'))]</field> -->
             <field name="domain">[]</field>
+            <field name="context">{'active_test': False}</field>
         </record>
 
         <menuitem id="menu_aplicacion" parent="stock.menu_stock_inventory_control"
