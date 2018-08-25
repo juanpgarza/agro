@@ -6,6 +6,8 @@
 
     'data': [
         'security/ir.model.access.csv',
-        'views/views.xml'
+        'views/views.xml',
+        'views/report_wizard_view.xml',
+        'reports/agro_report.xml'
     ],
 }

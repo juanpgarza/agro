@@ -690,6 +690,10 @@
                     <attribute name="invisible">1</attribute>
                 </field> -->                
                 
+                <xpath expr="//field[@name='order_line']/tree/field[@name='name']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
                 <xpath expr="//field[@name='order_line']/tree/field[@name='qty_invoiced']" position="attributes">
                     <attribute name="invisible">1</attribute>
                 </xpath>

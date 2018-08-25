@@ -250,6 +250,37 @@ class StockReportProductView(models.Model):
                             group by 1,2,3,4,5
                         ) """)
 
+
+class TodoWizard(models.TransientModel):
+    _name = 'report.wizard'
+    _description = 'Reporte de stock'
+
+    warehouse_id = fields.Many2one('stock.warehouse', string='Depósitos') 
+
+    @api.multi
+    def do_imprimir(self):
+    # @api.model
+    # def do_imprimir(self, cr, uid, ids, context=None):
+        k = self.env['stock.report.product.view'].search([('warehouse_id','=',self.warehouse_id.id)])
+        # import pdb; pdb.set_trace()
+
+        context = {}
+        # data = self.read(cr, uid, ids)[0]
+
+        datas = {
+        'ids': k,
+        'model': 'stock.report.product.view',
+        # 'form': data,
+        'context':context
+        }
+        return{
+            'type' : 'ir.actions.report.xml',
+            'report_name' : 'agro.report_agro_template',
+            'datas' : datas,
+        } 
+
+    
+
 class SaleOrder(models.Model):
     _inherit = ['sale.order']
     # _sql_constraints = [ ('agro_numero_pedido_unico',
