@@ -224,6 +224,10 @@ class StockMove(models.Model):
     _inherit = ['stock.move']
     _order = 'id desc'
 
+    picking_partner = fields.Char('Cliente',related='picking_id.partner_id.name')
+
+
+
 class StockReportProductView(models.Model):
         _name = 'stock.report.product.view'
         _description = 'stock.report.product.view'

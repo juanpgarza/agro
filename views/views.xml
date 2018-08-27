@@ -424,6 +424,9 @@
                 <field name="date" position='replace'>
                     <field name="date" widget="date"/>                    
                 </field>
+                <field name="location_dest_id" position="after">                    
+                    <field name="picking_partner"/>
+                </field>
             </field>
         </record>  
 
@@ -762,7 +765,7 @@
             <field name="context">{'active_test': False}</field>
         </record>
 
-        <menuitem id="menu_aplicacion" parent="stock.menu_stock_inventory_control"
+        <menuitem id="menu_aplicacion" name="Aplicaciones" parent="stock.menu_stock_inventory_control"
         sequence="10" action="sale.action_orders"/>
 
         <!-- 
