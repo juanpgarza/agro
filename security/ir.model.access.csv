@@ -2,3 +2,5 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_stock_picking_type_user,stock.picking.type user,model_stock_picking_type,stock.group_stock_user,1,1,1,0
 access_stock_report_product_view_user, stock.report.product.view,model_stock_report_product_view,stock.group_stock_user,1,1,1,0
 access_stock_report_product_view_manager, stock.report.product.view,model_stock_report_product_view,stock.group_stock_manager,1,1,1,0
+access_stock_report_trace_view_user, stock.report.trace.view,model_stock_report_trace_view,stock.group_stock_user,1,1,1,0
+access_stock_report_trace_view_manager, stock.report.trace.view,model_stock_report_trace_view,stock.group_stock_manager,1,1,1,0

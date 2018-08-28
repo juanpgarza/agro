@@ -479,6 +479,37 @@
         sequence="10" action="agro.action_stock_report" />
 
         <!-- 
+        *********** stock.report.trace.view 
+        -->
+        <record model="ir.ui.view" id="view_report_trace_stock_tree">
+            <field name="model">stock.report.trace.view</field>
+            <field eval="10" name="priority"/>
+            <field name="arch" type="xml">
+                <tree create="0" delete="0">
+                    <!-- <field name="default_code"/> -->
+                    <field name="id" invisible="1"/>
+                    <field name="ubicacion" invisible="0"/>
+                    <field name="product_id"/>
+                    <field name="qty"/>
+                    <!-- <field name="product_uom_id" groups="product.group_uom"/> -->                    
+                    <field name="lot_id"/>
+                    <field name="removal_date" widget='date'/>
+                </tree>
+            </field>
+        </record>
+
+        <act_window id="agro.action_stock_report_trace_view"  
+                    name="Trazabilidad"
+                    res_model="stock.report.trace.view" 
+                    view_mode="tree"
+                    target="current"/>
+
+<!--                     context="{'group_by': ['warehouse_id', 'location_id']}" -->
+
+        <menuitem id="menu_agro_report_trace_view" parent="stock.menu_warehouse_report"
+        sequence="10" action="agro.action_stock_report_trace_view" />
+
+        <!-- 
         *********** stock.picking.type 
         -->
 

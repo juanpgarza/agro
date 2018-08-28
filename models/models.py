@@ -254,6 +254,64 @@ class StockReportProductView(models.Model):
                             group by 1,2,3,4,5
                         ) """)
 
+class StockReportTraceView(models.Model):
+    _name = 'stock.report.trace.view'
+    _descripcion = 'stock.report.trace.view'
+    _auto = False
+
+    id = fields.Integer('Movimiento')
+    product_id = fields.Many2one('product.product',string='Producto')
+    qty = fields.Float('Cantidad')
+    ubicacion = fields.Char('Ubicación')
+    lot_id = fields.Many2one('stock.production.lot',string='Lote')
+    removal_date = fields.Datetime('Fecha venc. lote')
+
+    @api.model_cr
+    def init(self):
+            tools.drop_view_if_exists(self._cr,'stock_report_trace_view')
+            self._cr.execute(""" create view stock_report_trace_view as (
+select max(sq.id) as id,
+--sp.date_done,
+--pt.name,
+spl.product_id,
+sum(sq.qty) as qty,
+rp."name" as ubicacion,
+--spl."name",
+sq.lot_id,
+spl.removal_date
+from stock_move sm
+inner join stock_quant_move_rel sqm on sm.id = sqm.move_id
+inner join stock_picking sp on sm.picking_id = sp.id
+inner join stock_quant sq on sqm.quant_id = sq.id
+inner join stock_production_lot spl on sq.lot_id = spl.id
+inner join product_template pt on pt.id = spl.product_id
+inner join res_partner rp on sm.partner_id = rp.id
+--where sq.lot_id = 1
+--sm.id = 5 and 
+group by 2,4,5,6
+--order by 1
+union all
+select max(sq.id),
+--null,
+--pt.name as producto,
+spl.product_id,
+sum(sq.qty),
+(slp.name || '/' || sl.name) as Ubicacion, 
+--spl."name",
+sq.lot_id,
+spl.removal_date
+from stock_quant sq
+inner join stock_production_lot spl on sq.lot_id = spl.id
+inner join product_template pt on pt.id = spl.product_id
+inner join stock_location sl on sq.location_id = sl.id
+left join stock_location slp on slp.id = sl.location_id
+--inner join stock_quant_move_rel sqmr on sqmr.quant_id = sq.id
+where sl.usage IN ('internal','inventory')
+--and sq.lot_id = 1
+group by 2,4,5,6
+order by 5
+) """)
+
 
 class TodoWizard(models.TransientModel):
     _name = 'report.wizard'
