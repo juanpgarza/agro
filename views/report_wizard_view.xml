@@ -6,7 +6,7 @@
       <field name="arch" type="xml">
 
         <form>
-            <field name="warehouse_id"/>
+            <field name="location_id"/>
 
             <footer>
                 <button type="object" name="do_imprimir"
@@ -28,5 +28,67 @@
         />
 
     <menuitem id="menu_my_test_report" action="action_report_wizard" parent="stock.menu_warehouse_report" sequence="19"/>
+
+    <record id="view_form_alerta_wizard" model="ir.ui.view">
+      <field name="name">view_form_alerta_wizard</field>
+      <field name="model">alerta.wizard</field>
+      <field name="arch" type="xml">
+
+        <form>
+            <group>
+                <field name="dias_vencimiento" string="Lotes que se vencen dentro de los próximos: (días)"/>
+            </group>
+            <footer>
+                <button type="object" name="do_imprimir"
+                    string="Imprimir" class="oe_highlight"/>
+                <button special="cancel" string="Cancel"/>
+            </footer>
+        </form>
+
+      </field>
+    </record>
+
+    <!-- More button Action -->
+    <act_window id="action_alerta"
+        name="Reporte de alerta"
+        src_model="stock.production.lot"
+        res_model="alerta.wizard"
+        view_mode="form"
+        target="new"
+        />
+
+    <menuitem id="menu_alerta" action="action_alerta" parent="stock.menu_warehouse_report" sequence="20"/>
+
+    <record id="view_form_mail_wizard" model="ir.ui.view">
+      <field name="name">view_form_mail_wizard</field>
+      <field name="model">enviamail.wizard</field>
+      <field name="arch" type="xml">
+
+        <form>
+            <group>
+            <field name="user_target"/>
+            <field name="mail_target"/>
+            </group>
+
+            <footer>
+                <button type="object" name="send_mail"
+                    string="Enviar" class="oe_highlight"/>
+                <button special="cancel" string="Cancel"/>
+            </footer>
+        </form>
+
+      </field>
+    </record>
+
+    <!-- More button Action -->
+    <act_window id="action_mail"
+        name="Envio Mails"
+        src_model="enviamail.wizard"
+        res_model="enviamail.wizard"
+        view_mode="form"
+        target="new"
+        />
+
+    <menuitem id="menu_mail" action="action_mail" parent="stock.menu_warehouse_report" sequence="20"/>
 
 </odoo>

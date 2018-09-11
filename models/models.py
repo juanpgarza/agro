@@ -6,6 +6,10 @@ import dateutil.parser
 import logging
 _logger = logging.getLogger(__name__)
 import datetime
+import dateutil.parser
+
+from odoo.fields import Date as fDate
+from datetime import timedelta as td
 
 class StockPicking(models.Model):
     _inherit = ['stock.picking']
@@ -180,6 +184,36 @@ class StockProductionLot(models.Model):
 
     barcode = fields.Char(related='product_id.barcode', string='Código barras')
     
+    jpg_ids = fields.One2many('stock.report.trace.view', inverse_name='lot_id')
+
+    # dias_vencimiento = fields.Float()
+
+    dias_vencimiento = fields.Integer( string='Días al vencimiento', 
+            compute='_compute_age', inverse='_inverse_age', search='_search_age', store=False, compute_sudo=False,)
+
+    @api.depends('removal_date') 
+    def _compute_age(self):
+        today = fDate.from_string(fDate.today())
+        
+        for lote in self.filtered('removal_date'):
+            fecha_vencimiento = dateutil.parser.parse(lote.removal_date).date()
+            # import pdb; pdb.set_trace()
+            delta = (fecha_vencimiento - today)
+            lote.dias_vencimiento = delta.days
+
+    def _inverse_age(self): 
+        today = fDate.from_string(fDate.today())
+        for lote in self.filtered('removal_date'): 
+            d = td(days=lote.dias_vencimiento) - today 
+            book.removal_date = fDate.to_string(d)
+
+    def _search_age(self, operator, value): 
+        today = fDate.from_string(fDate.today()) 
+        value_days = td(days=value)
+        value_date = fDate.to_string(today + value_days) 
+        # import pdb; pdb.set_trace()
+        return [('removal_date', operator, value_date)]
+
     @api.model
     def create(self, vals):
         vals['removal_date'] = vals['removal_date'] + ' 10:00:00'
@@ -320,31 +354,95 @@ class TodoWizard(models.TransientModel):
     _name = 'report.wizard'
     _description = 'Reporte de stock'
 
-    warehouse_id = fields.Many2one('stock.warehouse', string='Depósitos') 
+    location_id = fields.Many2one('stock.location', string='Ubicaciones') 
 
     @api.multi
     def do_imprimir(self):
-    # @api.model
-    # def do_imprimir(self, cr, uid, ids, context=None):
-        k = self.env['stock.report.product.view'].search([('warehouse_id','=',self.warehouse_id.id)])
-        # import pdb; pdb.set_trace()
+        wizard_id = self.env['report.wizard2'].create({'descripcion': self.location_id.name})
+        stock_ids = self.env['stock.report.product.view'].search([('location_id','=',self.location_id.id)])
+        # import pdb;pdb.set_trace()
+        for stock in stock_ids:            
+            vals = {'product_id': stock.product_id.id,'wizard_id': wizard_id.id}
+            self.env['report.wizard.line'].create(vals)
 
-        context = {}
-        # data = self.read(cr, uid, ids)[0]
+        return self.env['report'].get_action(wizard_id, 'agro.report_agro_product_template')
 
-        datas = {
-        'ids': k,
-        'model': 'stock.report.product.view',
-        # 'form': data,
-        'context':context
-        }
-        return{
-            'type' : 'ir.actions.report.xml',
-            'report_name' : 'agro.report_agro_template',
-            'datas' : datas,
-        } 
+"""        for stock in stock_ids:
 
+             vals = { 'nombre del campo': 'nombre del valor a insertar'} """
+             
+         
+
+class TodoWizard2(models.TransientModel):
+    _name = 'report.wizard2'
+    _description = 'Reporte de stock 2'
+
+    descripcion = fields.Char('Descripcion')
+    lineas_id = fields.One2many('report.wizard.line', 'wizard_id')
     
+class TodoWizardLine(models.TransientModel):
+    _name = 'report.wizard.line'
+    _description = 'Lineas'
+
+    prueba = fields.Char('Prueba')
+    product_id = fields.Many2one('product.product')
+    wizard_id = fields.Many2one('report.wizard2')
+
+class AlertaWizard(models.TransientModel):
+    _name = 'alerta.wizard'
+    _description = 'Reporte de stock'
+
+    # dias = fields.Integer(string='Días') 
+    # fecha = fields.Date('Fecha')
+    dias_vencimiento = fields.Integer('Días al vencimiento')
+
+    @api.multi
+    def do_imprimir(self):         
+        wizard_id = self.env['alerta.wizard.encabezado'].create({'descripcion': self.dias_vencimiento})
+        #import pdb;pdb.set_trace()
+        stock_ids = self.env['stock.production.lot'].search([('dias_vencimiento','<=',self.dias_vencimiento)])
+        # import pdb;pdb.set_trace()
+        for stock in stock_ids:            
+            vals = {'product_id': stock.product_id.id,'wizard_id': wizard_id.id, 'lot_id': stock.id}
+            self.env['alerta.wizard.detalle'].create(vals)
+
+        return self.env['report'].get_action(wizard_id, 'agro.report_agro_alerta')
+
+class AlertaWizardEncabezado(models.TransientModel):
+    _name = 'alerta.wizard.encabezado'
+    _description = 'encabezado'
+
+    descripcion = fields.Char('Descripcion')
+    lineas_id = fields.One2many('alerta.wizard.detalle', 'wizard_id')
+    
+class AlertaWizardDetalle(models.TransientModel):
+    _name = 'alerta.wizard.detalle'
+    _description = 'detalle'
+
+    prueba = fields.Char('Prueba')
+    product_id = fields.Many2one('product.product')
+    lot_id = fields.Many2one('stock.production.lot')
+    wizard_id = fields.Many2one('alerta.wizard.encabezado')
+
+class EnviaMailWizard(models.TransientModel):
+    _name = 'enviamail.wizard'
+    _description = 'Envio de mails'
+
+    user_target = fields.Many2one('res.users', string='User Target')
+    mail_target = fields.Char(string='Email Target')
+
+    @api.multi
+    def send_mail(self):
+        user_id = self.user_target.id
+        body = self.mail_target
+
+        mail_details = {'subject': "Message subject",
+            'body': body,
+            'partner_ids': [(user_target)]
+            } 
+
+        mail = self.env['mail.thread']
+        mail.message_post(type="notification", subtype="mt_comment", **mail_details)
 
 class SaleOrder(models.Model):
     _inherit = ['sale.order']

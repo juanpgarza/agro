@@ -31,4 +31,120 @@
             </t>
         </t>
     </template>
+
+    <report id="action_agro_lot_report" 
+    string="Trazabilidad JPG" 
+    model="stock.production.lot" 
+    report_type="qweb-html"
+    name="agro.report_agro_lot_template"/>
+
+    <template id="report_agro_lot_template">
+        <t t-call="report.html_container">
+            <t t-call="report.external_layout">            
+                <div class="page">
+
+                    <t t-foreach="docs" t-as="o">
+                        <div class="row">
+                        <!-- Data Row Content -->
+                            <div class="row">
+                                <div class="col-xs-3"><span t-field="o.name" /></div>
+                                <div class="col-xs-3"><span t-field="o.removal_date" /></div>
+                            </div>
+
+                            <t t-foreach="o.jpg_ids" t-as="l">
+                                <div class="row">
+                                <!-- Data Row Content -->
+                                    
+                                    <div class="col-xs-3"><span t-field="l.location_id.name" /></div>
+                                    <div class="col-xs-3"><span t-field="l.ubicacion" /></div>
+                                    <div class="col-xs-3"><span t-field="l.product_id" /></div>
+                                    <div class="col-xs-3"><span t-field="l.qty" /></div>
+
+
+                                </div>
+                            </t>
+
+
+                        </div>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <report id="action_agro_product_report" 
+    string="Product JPG" 
+    model="report.wizard2" 
+    report_type="qweb-html"
+    name="agro.report_agro_product_template"/>
+
+    <template id="report_agro_product_template">
+        <t t-call="report.html_container">
+            <t t-call="report.external_layout">            
+                <div class="page">
+
+                    <t t-foreach="docs" t-as="o">
+                        <div class="row">
+                        <!-- Data Row Content -->
+                            
+                            <div class="col-xs-3"><span t-field="o.descripcion" /></div>
+                        </div>
+                        <br />
+                        <t t-foreach="o.lineas_id" t-as="l">
+                                <div class="row">
+                                <!-- Data Row Content -->
+                                    
+                                    <div class="col-xs-3"><span t-field="l.product_id" /></div>
+
+
+                                </div>
+                            </t>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <report id="action_agro_alerta" 
+    string="Alerta JPG" 
+    model="alerta.wizard.encabezado" 
+    report_type="qweb-html"
+    name="agro.report_agro_alerta"/>
+
+    <template id="report_agro_alerta">
+        <t t-call="report.html_container">
+            <t t-call="report.external_layout">            
+                <div class="page">
+
+                    <t t-foreach="docs" t-as="o">
+                        <div class="row">
+                        <!-- Data Row Content -->
+                            
+                            <div class="col-xs-3"><span t-field="o.descripcion" /></div>
+                        </div>
+                        <br />
+                        <div class="row">
+                                <!-- Data Row Content -->                                    
+                            <div class="col-xs-3">Producto</div>
+                            <div class="col-xs-3">Lote</div>                                    
+                            <div class="col-xs-3">Fecha Venc.</div>    
+                            <div class="col-xs-3">Días al venc.</div>
+                                                                    
+                        </div>
+                        <t t-foreach="o.lineas_id" t-as="l">
+                                <div class="row">
+                                <!-- Data Row Content -->                                    
+                                    <div class="col-xs-3"><span t-field="l.product_id" /></div>
+                                    <div class="col-xs-3"><span t-field="l.lot_id" /></div>                                    
+                                    <div class="col-xs-3"><span t-field="l.lot_id.removal_date" /></div>    
+                                    <div class="col-xs-3"><span t-field="l.lot_id.dias_vencimiento" /></div>
+                                                                    
+                                </div>
+                            </t>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+
 </odoo>
