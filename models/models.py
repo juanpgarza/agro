@@ -438,11 +438,51 @@ class EnviaMailWizard(models.TransientModel):
 
         mail_details = {'subject': "Message subject",
             'body': body,
-            'partner_ids': [(user_target)]
+            'partner_ids': [(6,0,[(self.user_target.partner_id.id)])]
+            # ,            'partner_ids': [(self.user_target.id)
+            
             } 
 
         mail = self.env['mail.thread']
         mail.message_post(type="notification", subtype="mt_comment", **mail_details)
+
+class ResUsers(models.Model):
+    _inherit = ['res.users']
+
+    @api.model
+    def send_email(self):
+        users = self.env['res.users'].search([])
+        for user in users:
+            if True:
+            # if user.receive_alert = True:
+                user_id = user.id
+                # body = 'Hola mundo'
+
+                stock_ids = self.env['stock.production.lot'].search([('dias_vencimiento','<=',15)])
+                # import pdb;pdb.set_trace()
+                for stock in stock_ids:            
+                    vals = {'product_id': stock.product_id.id,'wizard_id': wizard_id.id, 'lot_id': stock.id}
+                    self.env['alerta.wizard.detalle'].create(vals)
+
+""" ALGO asi tengo que hacer dentro del for.                    	
+    lista = []
+	for stock in stock_ids:
+	cadena = stock.product_id.display_name + ' - ' + stock.lot_id.name
+	lista.append(cadena)
+	body = '\n'.join(lista) """
+
+
+                mail_details = {'subject': "Message subject",
+                    'body': body,
+                    'partner_ids': [(6,0,[(user_id)])]
+                    # ,            'partner_ids': [(self.user_target.id)
+                    
+                    } 
+
+                mail = self.env['mail.thread']
+                mail.message_post(type="notification", subtype="mt_comment", **mail_details)
+
+
 
 class SaleOrder(models.Model):
     _inherit = ['sale.order']
