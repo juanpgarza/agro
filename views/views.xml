@@ -113,7 +113,7 @@
                     <!-- <field name="name"/> -->
                     <field name="id"/>
                     <field name="warehouse"/>
-                    <field name="min_date" string="Fecha" widget="date"/>
+                    <!-- <field name="min_date" string="Fecha" widget="date"/> -->
                     <!-- <field name="picking_type_id" string='Tipo de movimiento'/> -->
                     <!-- <field name="code"/> -->
                     <field name="picking_type" string='Tipo de movimiento'/>                    
@@ -175,9 +175,9 @@
                     <field name="id"/>              
                 </field>
 
-                <field name="min_date" position='replace'>
+                <!-- <field name="min_date" position='replace'>
                     <field name="min_date" widget="date"/>
-                </field>
+                </field> -->
                     
 
                 <field name="origin" position="after">                    
@@ -269,13 +269,13 @@
                     <field name="grupo_usuario" invisible="0"/>
                 </field>
 
-                <field name="in_date" position='attributes'>
+                <!-- <field name="in_date" position='attributes'>
                     <attribute name="attrs">{'invisible': [('grupo_usuario','=','administrador')]}</attribute>
-                </field>
+                </field> -->
 
-                <field name="inventory_value" position='attributes'>
+                <!-- <field name="inventory_value" position='attributes'>
                     <attribute name="invisible">1</attribute>
-                </field>
+                </field> -->
 
             </field>
         </record>
@@ -290,9 +290,9 @@
                     <field name="grupo_usuario" invisible="0"/>
                 </field>
 
-                <field name="in_date" position='attributes'>
+                <!-- <field name="in_date" position='attributes'>
                     <attribute name="attrs">{'invisible': [('grupo_usuario','=','administrador')]}</attribute>
-                </field>
+                </field> -->
 
             </field>
         </record>
@@ -376,7 +376,7 @@
                     <field name="product_qty" string="Cantidad"/>
                     <field name="removal_date" widget="date"/>
                     <field name="dias_vencimiento"/>                    
-                    <field name="jpg_ids"/>
+                    <!-- <field name="jpg_ids"/> -->
                 </field>
                 <field name="create_date" position='replace'>
                     <field name="create_date" widget="date"/>                    
@@ -384,13 +384,13 @@
             </field>
         </record>  
 
-        <record model="ir.actions.act_window" id="lot_trace">
+        <!-- <record model="ir.actions.act_window" id="lot_trace">
             <field name="name">Trace</field>
             <field name="context">{'search_default_lot_id': active_id}</field>
             <field name="res_model">stock.report.trace.view</field>
-        </record>
+        </record> -->
 
-        <record id= "agro_view_production_lot_form_inherited" model= "ir.ui.view">
+        <!-- <record id= "agro_view_production_lot_form_inherited" model= "ir.ui.view">
             <field name="inherit_id" ref="stock.view_production_lot_form" />
             <field name="model">stock.production.lot</field>
             <field name="arch" type="xml">                
@@ -399,7 +399,7 @@
                     class="oe_stat_button" string="Trazabilidad JPG" type="action"/>
                 </xpath>
             </field>
-        </record>
+        </record> -->
 
         <record id= "agro_view_move_form_expiry_inherited" model= "ir.ui.view">
             <field name="name">stock.production.lot.form</field>
@@ -434,12 +434,12 @@
             <field name="inherit_id" ref="stock.view_move_tree" />
             <field name="model">stock.move</field>
             <field name="arch" type="xml">                
-                <field name="name" position="before">                    
+                <!-- <field name="name" position="before">                    
                     <field name="id"/>
-                </field>
-                <field name="date_expected" position='replace'>
+                </field> -->
+                <!-- <field name="date_expected" position='replace'>
                     <field name="date_expected" widget="date"/>                    
-                </field>
+                </field> -->
                 <field name="date" position='replace'>
                     <field name="date" widget="date"/>                    
                 </field>
@@ -500,25 +500,25 @@
         <!-- 
         *********** stock.report.trace.view 
         -->
-        <record model="ir.ui.view" id="view_report_trace_stock_tree">
+        <!-- <record model="ir.ui.view" id="view_report_trace_stock_tree">
             <field name="model">stock.report.trace.view</field>
             <field eval="10" name="priority"/>
             <field name="arch" type="xml">
                 <tree create="0" delete="0">
-                    <!-- <field name="default_code"/> -->
+                    <field name="default_code"/>
                     <field name="id" invisible="1"/>
                     <field name="location_id" invisible="0"/>
                     <field name="ubicacion" invisible="0"/>
                     <field name="product_id"/>
                     <field name="qty"/>
-                    <!-- <field name="product_uom_id" groups="product.group_uom"/> -->                    
+                    <field name="product_uom_id" groups="product.group_uom"/>                    
                     <field name="lot_id"/>
                     <field name="removal_date" widget='date'/>
                 </tree>
             </field>
-        </record>
+        </record> -->
 
-        <record id="view_report_stock_trace_search" model="ir.ui.view">
+        <!-- <record id="view_report_stock_trace_search" model="ir.ui.view">
             <field name="model">stock.report.trace.view</field>
             <field name="arch" type="xml">
                 <search>
@@ -533,18 +533,18 @@
                     <filter name="group_lot_removal_date"        string="Por venc. lote" context="{'group_by': 'removal_date'}"/>
                 </search>
             </field>
-        </record>
+        </record> -->
 
-        <act_window id="agro.action_stock_report_trace_view"  
+        <!-- <act_window id="agro.action_stock_report_trace_view"  
                     name="Trazabilidad"
                     res_model="stock.report.trace.view" 
                     view_mode="tree"
-                    target="current"/>
+                    target="current"/> -->
 
 <!--                     context="{'group_by': ['warehouse_id', 'location_id']}" -->
 
-        <menuitem id="menu_agro_report_trace_view" parent="stock.menu_warehouse_report"
-        sequence="10" action="agro.action_stock_report_trace_view" />
+        <!-- <menuitem id="menu_agro_report_trace_view" parent="stock.menu_warehouse_report"
+        sequence="10" action="agro.action_stock_report_trace_view" /> -->
 
         <!-- 
         *********** stock.picking.type 
@@ -626,15 +626,15 @@
      
         
 
-        <record id= "stock.menu_stock_procurement_action" model= "ir.ui.menu">
+        <!-- <record id= "stock.menu_stock_procurement_action" model= "ir.ui.menu">
             <field name="groups_id"  eval="[(4,ref('sin_implementar')), 
                                             (3,ref('stock.group_stock_manager'))]" />             
-        </record> 
+        </record>  -->
 
-        <record id= "stock.menu_stock_sched" model= "ir.ui.menu">
+        <!-- <record id= "stock.menu_stock_sched" model= "ir.ui.menu">
             <field name="groups_id"  eval="[(4,ref('sin_implementar')), 
                                             (3,ref('stock.group_stock_manager'))]" />             
-        </record>
+        </record> -->
 
         <record id= "stock.menu_reordering_rules_config" model= "ir.ui.menu">
             <field name="groups_id"  eval="[(4,ref('sin_implementar'))]" />             
@@ -647,14 +647,14 @@
             <field name="groups_id"  eval="[(3,ref('stock.group_stock_manager'))]" />             
         </record>
 
-        <record id= "stock.menu_report_stock_line_date" model= "ir.ui.menu">
+        <!-- <record id= "stock.menu_report_stock_line_date" model= "ir.ui.menu">
             <field name="groups_id"  eval="[(4,ref('sin_implementar')), (3,ref('base.group_no_one'))]" />             
-        </record>
+        </record> -->
 
         <!-- Este reporte permite consultar las cantidades en stock -->
-        <record id= "stock.menu_quants" model= "ir.ui.menu">
+        <!-- <record id= "stock.menu_quants" model= "ir.ui.menu">
             <field name="groups_id"  eval="[(3,ref('sin_implementar'))], [(3,ref('sales_team.group_sale_manager'))]" />             
-        </record>
+        </record> -->
 
 
         <!-- <record id= "stock.menu_stock_root" model= "ir.ui.menu">
