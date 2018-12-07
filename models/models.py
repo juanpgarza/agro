@@ -446,6 +446,7 @@ class EnviaMailWizard(models.TransientModel):
         mail = self.env['mail.thread']
         mail.message_post(type="notification", subtype="mt_comment", **mail_details)
 
+"""
 class ResUsers(models.Model):
     _inherit = ['res.users']
 
@@ -464,12 +465,12 @@ class ResUsers(models.Model):
                     vals = {'product_id': stock.product_id.id,'wizard_id': wizard_id.id, 'lot_id': stock.id}
                     self.env['alerta.wizard.detalle'].create(vals)
 
-""" ALGO asi tengo que hacer dentro del for.                    	
+# ALGO asi tengo que hacer dentro del for.                    	
     lista = []
 	for stock in stock_ids:
 	cadena = stock.product_id.display_name + ' - ' + stock.lot_id.name
 	lista.append(cadena)
-	body = '\n'.join(lista) """
+	body = '\n'.join(lista) #
 
 
                 mail_details = {'subject': "Message subject",
@@ -481,7 +482,7 @@ class ResUsers(models.Model):
 
                 mail = self.env['mail.thread']
                 mail.message_post(type="notification", subtype="mt_comment", **mail_details)
-
+"""
 
 
 class SaleOrder(models.Model):
